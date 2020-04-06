@@ -71,6 +71,7 @@ public class GenerateAst {
       String className,
       String fieldList
   ) {
+    writer.println();
     writer.println(
         "  static class " + className + " extends " + baseName + " {"
     );
