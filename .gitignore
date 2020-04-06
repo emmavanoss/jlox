@@ -5,3 +5,4 @@
 .idea/shelf/
 .idea/modules.xml
 .idea/libraries/
+out/*/*.class
