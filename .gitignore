@@ -1,8 +1,10 @@
+## Java 
+*.class
+
+## IntelliJ
+out/
+.idea/
 *.iml
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/tasks.xml
-.idea/shelf/
-.idea/modules.xml
-.idea/libraries/
-/out/*
+
+## OS X
+.DS_Store
