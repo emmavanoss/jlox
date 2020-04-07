@@ -2,15 +2,27 @@ package com.craftinginterpreters.lox;
 
 import javax.management.RuntimeErrorException;
 import javax.swing.*;
+import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object> {
-  public void interpret(Expr expression) {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+  private Environment environment = new Environment();
+
+  public void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(stringify(value));
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
+  }
+
+  private Object evaluate(Expr expr) {
+    return expr.accept(this);
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
   }
 
   @Override
@@ -37,20 +49,6 @@ class Interpreter implements Expr.Visitor<Object> {
 
    // Unreachable
    return null;
-  }
-
-  private void checkNumberOperand(Token operator, Object operand) {
-    if (operand instanceof Double) return;
-    throw new RuntimeError(operator, "Operand must be a number.");
-  }
-
-  private void checkNumberOperands(Token operator, Object left, Object right) {
-    if (left instanceof Double && right instanceof Double) return;
-    throw new RuntimeError(operator, "Operands must be numbers.");
-  }
-
-  private Object evaluate(Expr expr) {
-    return expr.accept(this);
   }
 
   @Override
@@ -99,6 +97,21 @@ class Interpreter implements Expr.Visitor<Object> {
     return null;
   }
 
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+    return null;
+  }
+
+  // Helpers
+
   private Boolean isTruthy(Object object) {
     if (object == null) return false;
     if (object instanceof Boolean) return (boolean)object;
@@ -110,6 +123,16 @@ class Interpreter implements Expr.Visitor<Object> {
     if (left == null & right == null) return true;
     if (left == null) return false;
     return left.equals(right);
+  }
+
+  private void checkNumberOperand(Token operator, Object operand) {
+    if (operand instanceof Double) return;
+    throw new RuntimeError(operator, "Operand must be a number.");
+  }
+
+  private void checkNumberOperands(Token operator, Object left, Object right) {
+    if (left instanceof Double && right instanceof Double) return;
+    throw new RuntimeError(operator, "Operands must be numbers.");
   }
 
   private String stringify(Object object) {
