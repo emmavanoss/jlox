@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static com.craftinginterpreters.lox.TokenType.*;
 
@@ -47,6 +48,7 @@ class Parser {
 
   private Stmt statement() {
     if (match(IF)) return ifStatement();
+    if (match(FOR)) return forStatement();
     if (match(PRINT)) return printStatement();
     if (match(WHILE)) return whileStatement();
     if (match(LEFT_BRACE)) return new Stmt.Block(block());
@@ -67,6 +69,48 @@ class Parser {
     }
 
     return new Stmt.If(condition, thenBranch, elseBranch);
+  }
+
+  private Stmt forStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+    // parse initializer (null, var declaration or expression statement)
+    Stmt initializer;
+    if (match(SEMICOLON)) {
+      initializer = null;
+    } else if (match(VAR)) {
+      initializer = varDeclaration();
+    } else {
+      initializer = expressionStatement();
+    }
+    // parse condition (null or expression)
+    Expr condition = null;
+    if (!check(SEMICOLON)) {
+      condition = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+    // parse increment (null or expression)
+    Expr increment = null;
+    if (!check(RIGHT_PAREN)) {
+      increment = expression();
+    }
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+    // parse body
+    Stmt body = statement();
+
+    // execute increment at end of each loop
+    if (increment != null) body = new Stmt.Block(Arrays.asList(
+        body,
+        new Stmt.Expression(increment)));
+    // transform into while loop using condition (or 'while true' if null)
+    if (condition == null) condition = new Expr.Literal(true);
+    body = new Stmt.While(condition, body);
+    // execute initializer once before while loop
+    if (initializer != null) {
+      body = new Stmt.Block(Arrays.asList(initializer, body));
+    }
+
+    return body;
   }
 
   private Stmt printStatement() {
