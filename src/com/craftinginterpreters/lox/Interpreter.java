@@ -123,6 +123,22 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   }
 
   @Override
+  public Object visitLogicalExpr(Expr.Logical expr) {
+    Object left = evaluate(expr.left);
+
+    if (expr.operator.type == TokenType.OR) {
+      // return truthy left-hand value, as OR will be truthy
+      if (isTruthy(left)) return left;
+    } else {
+      // return falsy left-hand value, as AND will be falsy
+      if (!isTruthy(left)) return left;
+    }
+
+    // return truthy/falsy right-hand value, as OR/AND will be truthy/falsy
+    return evaluate(expr.right);
+  }
+
+  @Override
   public Void visitExpressionStmt(Stmt.Expression stmt) {
     evaluate(stmt.expression);
     return null;

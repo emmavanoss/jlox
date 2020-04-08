@@ -23,10 +23,6 @@ class Parser {
     return statements;
   }
 
-  private Expr expression() {
-    return assignment();
-  }
-
   private Stmt declaration() {
     try {
       if (match(VAR)) return varDeclaration();
@@ -78,12 +74,6 @@ class Parser {
     return new Stmt.Var(name, initializer);
   }
 
-  private Stmt expressionStatement() {
-    Expr value = expression();
-    consume(SEMICOLON, "Expect ';' after expression.");
-    return new Stmt.Expression(value);
-  }
-
   private List<Stmt> block() {
     List<Stmt> statements = new ArrayList<>();
 
@@ -95,8 +85,18 @@ class Parser {
     return statements;
   }
 
+  private Stmt expressionStatement() {
+    Expr value = expression();
+    consume(SEMICOLON, "Expect ';' after expression.");
+    return new Stmt.Expression(value);
+  }
+
+  private Expr expression() {
+    return assignment();
+  }
+
   private Expr assignment() {
-    Expr expr = equality();
+    Expr expr = or();
 
     if (match(EQUAL)) {
       Token equals = previous(); // left hand side
@@ -109,6 +109,30 @@ class Parser {
       }
 
       error(equals, "Invalid target for assignment.");
+    }
+
+    return expr;
+  }
+
+  private Expr or() {
+    Expr expr = and();
+
+    while (match(OR)) {
+      Token operator = previous();
+      Expr right = and();
+      return new Expr.Logical(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private Expr and() {
+    Expr expr = equality();
+
+    while (match(AND)) {
+      Token operator = previous();
+      Expr right = equality();
+      return new Expr.Logical(expr, operator, right);
     }
 
     return expr;
