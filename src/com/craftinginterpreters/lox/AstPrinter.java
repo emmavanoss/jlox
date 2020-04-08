@@ -33,9 +33,14 @@ class AstPrinter implements Expr.Visitor<String> {
     return expr.name.toString();
   }
 
-  // TODO implement for assignment
+  // TODO implement for remaining expression types
   @Override
   public String visitAssignExpr(Expr.Assign expr) {
+    return null;
+  }
+
+  @Override
+  public String visitLogicalExpr(Expr.Logical expr) {
     return null;
   }
 
