@@ -48,16 +48,19 @@ public class Lox {
   }
 
   private static void run(String source) {
-     Scanner scanner = new Scanner(source);
-     List<Token> tokens = scanner.scanTokens();
-     Parser parser = new Parser(tokens);
-     List<Stmt> statements = parser.parse();
+    Scanner scanner = new Scanner(source);
+    List<Token> tokens = scanner.scanTokens();
+    Parser parser = new Parser(tokens);
+    List<Stmt> statements = parser.parse();
 
-     // Stop if syntax error
+    // Stop if syntax error
     if (hadError) return;
 
     Resolver resolver = new Resolver(interpreter);
     resolver.resolve(statements);
+
+    // Stop if resolution error
+    if (hadError) return;
 
     interpreter.interpret(statements);
   }
