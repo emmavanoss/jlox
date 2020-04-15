@@ -196,16 +196,19 @@ class Parser {
   }
 
   private Expr assignment() {
-    Expr expr = or();
+    Expr expr = or(); // evaluate left side, not knowing this will be assignment
 
     if (match(EQUAL)) {
-      Token equals = previous(); // left hand side
-      Expr value = assignment(); // right hand side (recursive)
+      Token equals = previous(); // '=' token (for error reporting)
+      Expr value = assignment(); // evaluate right hand side (recursive)
 
-      // valid assignment to a variable
+      // valid assignment to var or instance property
       if (expr instanceof Expr.Variable) {
         Token name = ((Expr.Variable)expr).name; // name before being evaluated
         return new Expr.Assign(name, value);
+      } else if (expr instanceof Expr.Get) {
+        Expr.Get get = (Expr.Get)expr;
+        return new Expr.Set(get.object, get.name, value);
       }
 
       error(equals, "Invalid target for assignment.");
@@ -301,6 +304,10 @@ class Parser {
     while (true) {
       if (match(LEFT_PAREN)) {
         expr = finishCall(expr);
+      } else if (match(DOT)) {
+        Token name = consume(IDENTIFIER,
+            "Expect property name after '.'.");
+        expr = new Expr.Get(expr, name);
       } else {
         break;
       }

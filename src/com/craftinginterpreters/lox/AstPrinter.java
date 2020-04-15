@@ -42,6 +42,10 @@ class AstPrinter implements Expr.Visitor<String> {
   public String visitLogicalExpr(Expr.Logical expr) { return null; }
   @Override
   public String visitCallExpr(Expr.Call expr) { return null; }
+  @Override
+  public String visitGetExpr(Expr.Get expr) { return null; }
+  @Override
+  public String visitSetExpr(Expr.Set expr) { return null; }
 
   private String parenthesize(String name, Expr... exprs) {
     StringBuilder builder = new StringBuilder();
