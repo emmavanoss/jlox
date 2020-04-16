@@ -34,20 +34,15 @@ class AstPrinter implements Expr.Visitor<String> {
   }
 
   // TODO implement for remaining expression types
-  @Override
-  public String visitAssignExpr(Expr.Assign expr) {
+  @Override public String visitAssignExpr(Expr.Assign expr) {
     return null;
   }
-  @Override
-  public String visitLogicalExpr(Expr.Logical expr) { return null; }
-  @Override
-  public String visitCallExpr(Expr.Call expr) { return null; }
-  @Override
-  public String visitGetExpr(Expr.Get expr) { return null; }
-  @Override
-  public String visitSetExpr(Expr.Set expr) { return null; }
-  @Override
-  public String visitThisExpr(Expr.This expr) { return null; }
+  @Override public String visitLogicalExpr(Expr.Logical expr) { return null; }
+  @Override public String visitCallExpr(Expr.Call expr) { return null; }
+  @Override public String visitGetExpr(Expr.Get expr) { return null; }
+  @Override public String visitSetExpr(Expr.Set expr) { return null; }
+  @Override public String visitThisExpr(Expr.This expr) { return null; }
+  @Override public String visitSuperExpr(Expr.Super expr) { return null; }
 
   private String parenthesize(String name, Expr... exprs) {
     StringBuilder builder = new StringBuilder();
