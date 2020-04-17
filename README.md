@@ -3,7 +3,8 @@
 An implementation of lox in java, following [Bob Nystrom's guide to crafting
 interpreters](https://craftinginterpreters.com/).
 
-It's almost completely implemented except for inheritance. Make your own way in this world.
+It's almost completely implemented with some notably missing features. You didn't need
+arrays I hope.
 
 ## Lox
 
